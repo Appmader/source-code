@@ -1,0 +1,189 @@
+package jvproj2;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+
+class GROUP
+{
+	static final int MAX_address = 100;
+	String group;
+	String[] name = new String[MAX_address];
+	String[] phone = new String[MAX_address];
+	int current_address = 0;
+	
+	GROUP(String g , String n , String p)
+	{
+		group = g;
+		name[current_address] = n;
+		phone[current_address] = p;
+		current_address++;
+	}
+	void Add(String n , String p)
+	{
+		name[current_address] = n;
+		phone[current_address] = p;
+		current_address++;
+	}
+	void Show()
+	{
+		System.out.println("NAME : " + name + "PHONE : " + phone);
+	}
+	String get()
+	{
+		return group;
+	}
+	
+}
+
+
+public class GUIAddressBook extends JFrame
+{
+	JPanel InputPanel;
+	JPanel OutputPanel;
+	JPanel TitlePanel;
+	
+	JLabel setName;
+	JLabel setPhone;
+	JLabel setGroup;
+	
+	JTextField Name;
+	JTextField Phone;
+	JTextField Group;
+	
+	JLabel Text;
+	JButton Apply;
+	JList out;
+	String g;
+	String n;
+	String p;
+	Vector<GROUP> address = new Vector<GROUP>();
+	
+	GUIAddressBook()
+	{
+		Container contentPane = getContentPane();
+		contentPane.setLayout(new BorderLayout());
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//set contentPane.
+		
+		InputPanel = new JPanel();
+		OutputPanel = new JPanel();
+		TitlePanel = new JPanel();
+		//add Panel.
+		
+		contentPane.add(InputPanel, BorderLayout.WEST);
+		contentPane.add(OutputPanel, BorderLayout.EAST);
+		contentPane.add(TitlePanel, BorderLayout.NORTH);
+		//Add Panel in contentPane.
+		
+		InputPanel.setLayout(new GridLayout(4,2));
+		OutputPanel.setLayout(new FlowLayout());
+		TitlePanel.setLayout(new FlowLayout());
+		//set Layout in JPanel.
+		
+		Name = new JTextField("NAME");
+		Phone = new JTextField("PHONE");
+		Group = new JTextField("GROUP");
+		Apply = new JButton("APPLY");
+		setName = new JLabel("NAME :");
+		setPhone = new JLabel("PHONE :");
+		setGroup = new JLabel("GROUP :");
+		out = new JList();
+		//set components
+		
+		InputPanel.add(setName);
+		InputPanel.add(Name);
+		InputPanel.add(setPhone);
+		InputPanel.add(Phone);
+		InputPanel.add(setGroup);
+		InputPanel.add(Group);
+		InputPanel.add(Apply);
+		//add components in Panel.
+		
+		OutputPanel.add(out);
+		OutputPanel.add(new JScrollPane(out));
+		//Add JTextArea in OutputPanel.
+		Text = new JLabel("Address Management");
+		TitlePanel.setBackground(new Color(0,0,255));
+		Text.setForeground(new Color(255,255,255));
+		TitlePanel.add(Text);
+		
+		Event click = new Event();
+		Apply.addActionListener(click);
+		
+		setTitle("Management of Address");
+		setSize(400,200);
+		setVisible(true);
+		//setting
+	}
+	
+	
+	class Event implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			String check = e.getActionCommand();
+			GROUP book;
+			g = (Group.getText()).trim();
+			n = (Name.getText()).trim();
+			p = (Phone.getText()).trim();
+			if(check.equals("APPLY"))
+			{
+				if(g.equals("") || g.equals("NULL"))
+				{
+					Group.setText("NULL");
+				}
+				else
+				{
+					if(n.equals("") || n.equals("NULL"))
+					{
+						Name.setText("NULL");
+					}
+					else
+					{
+						if(p.equals("") || p.equals("NULL"))
+						{
+							Phone.setText("NULL");
+						}
+						else
+						{
+							for(int i = 0; i < address.size(); i++)
+							{
+								book = address.get(i);
+								if(book.group == g)
+								{
+									if(book.current_address == book.MAX_address)
+									{
+										break;
+									}
+									else
+									{
+										book.Add(n,p);
+										Group.setText("");
+										Name.setText("");
+										Phone.setText("");
+										break;
+									}
+								}
+								else
+								{
+									address.add(new GROUP(g,n,p));
+								}
+								
+							}
+						}
+					}
+				}
+			}
+			
+		}
+		
+	}
+	public static void main(String[] args)
+	{
+		new GUIAddressBook();
+		
+	}
+
+}
