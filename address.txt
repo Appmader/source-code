@@ -5,9 +5,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-class GROUP
+class GROUP 
 {
-	static final int MAX_address = 100;
+	final int MAX_address = 100;
 	String group;
 	String[] name = new String[MAX_address];
 	String[] phone = new String[MAX_address];
@@ -26,15 +26,19 @@ class GROUP
 		phone[current_address] = p;
 		current_address++;
 	}
-	void Show()
-	{
-		System.out.println("NAME : " + name + "PHONE : " + phone);
-	}
-	String get()
+	
+	String getGroup()
 	{
 		return group;
 	}
-	
+	String getName(int num)
+	{
+		return name[num];
+	}
+	String getPhone(int num)
+	{
+		return phone[num];
+	}
 }
 
 
@@ -43,6 +47,7 @@ public class GUIAddressBook extends JFrame
 	JPanel InputPanel;
 	JPanel OutputPanel;
 	JPanel TitlePanel;
+	JPanel ButtonPanel;
 	
 	JLabel setName;
 	JLabel setPhone;
@@ -54,11 +59,16 @@ public class GUIAddressBook extends JFrame
 	
 	JLabel Text;
 	JButton Apply;
-	JList out;
-	String g;
-	String n;
-	String p;
-	Vector<GROUP> address = new Vector<GROUP>();
+	JButton Delete;
+	JButton GDelete;
+	JButton Nsearch;
+	JButton Gsearch;
+	JButton Asearch;
+	JTextArea List;
+	String g = new String();
+	String n = new String();
+	String p = new String();
+	Vector<GROUP> address = new Vector<GROUP>(10);
 	
 	GUIAddressBook()
 	{
@@ -68,28 +78,36 @@ public class GUIAddressBook extends JFrame
 		//set contentPane.
 		
 		InputPanel = new JPanel();
+		ButtonPanel = new JPanel();
 		OutputPanel = new JPanel();
 		TitlePanel = new JPanel();
 		//add Panel.
 		
 		contentPane.add(InputPanel, BorderLayout.WEST);
-		contentPane.add(OutputPanel, BorderLayout.EAST);
+		contentPane.add(OutputPanel, BorderLayout.CENTER);
 		contentPane.add(TitlePanel, BorderLayout.NORTH);
+		contentPane.add(ButtonPanel, BorderLayout.SOUTH);
 		//Add Panel in contentPane.
 		
 		InputPanel.setLayout(new GridLayout(4,2));
-		OutputPanel.setLayout(new FlowLayout());
 		TitlePanel.setLayout(new FlowLayout());
+		ButtonPanel.setLayout(new FlowLayout());
 		//set Layout in JPanel.
 		
-		Name = new JTextField("NAME");
-		Phone = new JTextField("PHONE");
-		Group = new JTextField("GROUP");
+		Name = new JTextField();
+		Phone = new JTextField();
+		Group = new JTextField();
 		Apply = new JButton("APPLY");
+		Delete = new JButton("DELETE");
+		GDelete = new JButton("GDELETE");
+		Nsearch = new JButton("NS");
+		Gsearch = new JButton("GS");
+		Asearch = new JButton("AS");
+		
 		setName = new JLabel("NAME :");
 		setPhone = new JLabel("PHONE :");
 		setGroup = new JLabel("GROUP :");
-		out = new JList();
+		List = new JTextArea(7, 25);
 		//set components
 		
 		InputPanel.add(setName);
@@ -98,92 +116,186 @@ public class GUIAddressBook extends JFrame
 		InputPanel.add(Phone);
 		InputPanel.add(setGroup);
 		InputPanel.add(Group);
-		InputPanel.add(Apply);
+		ButtonPanel.add(Apply);
+		ButtonPanel.add(Delete);
+		ButtonPanel.add(GDelete);
+		ButtonPanel.add(Gsearch);
+		ButtonPanel.add(Nsearch);
+		ButtonPanel.add(Asearch);
 		//add components in Panel.
 		
-		OutputPanel.add(out);
-		OutputPanel.add(new JScrollPane(out));
+		List.setEditable(false);
+		JScrollPane scroll = new JScrollPane(List);
+		OutputPanel.add(scroll);
 		//Add JTextArea in OutputPanel.
 		Text = new JLabel("Address Management");
 		TitlePanel.setBackground(new Color(0,0,255));
 		Text.setForeground(new Color(255,255,255));
 		TitlePanel.add(Text);
 		
-		Event click = new Event();
-		Apply.addActionListener(click);
+		Event event = new Event();
+		Apply.addMouseListener(event);
+		Delete.addMouseListener(event);
+		GDelete.addMouseListener(event);
+		Gsearch.addMouseListener(event);
+		Nsearch.addMouseListener(event);
+		Asearch.addMouseListener(event);
 		
 		setTitle("Management of Address");
-		setSize(400,200);
+		setSize(450,250);
 		setVisible(true);
 		//setting
 	}
 	
-	
-	class Event implements ActionListener
+	class Event extends MouseAdapter
 	{
-		public void actionPerformed(ActionEvent e)
+		public void mouseClicked(MouseEvent e)
 		{
-			String check = e.getActionCommand();
+			JButton button = (JButton)e.getSource();
+			String check = button.getText();
 			GROUP book;
 			g = (Group.getText()).trim();
 			n = (Name.getText()).trim();
 			p = (Phone.getText()).trim();
-			if(check.equals("APPLY"))
+			switch(check)
 			{
-				if(g.equals("") || g.equals("NULL"))
-				{
-					Group.setText("NULL");
-				}
-				else
-				{
-					if(n.equals("") || n.equals("NULL"))
+				case "APPLY":
+					if(g.equals("") || n.equals("") || p.equals(""))
 					{
-						Name.setText("NULL");
+						return;
 					}
 					else
 					{
-						if(p.equals("") || p.equals("NULL"))
+						for(int i = 0; i <= address.size(); i++)
 						{
-							Phone.setText("NULL");
-						}
-						else
-						{
-							for(int i = 0; i < address.size(); i++)
+							book = address.get(i);
+							if(book.getGroup() == g)
 							{
-								book = address.get(i);
-								if(book.group == g)
+								if(book.current_address == book.MAX_address)
 								{
-									if(book.current_address == book.MAX_address)
-									{
-										break;
-									}
-									else
-									{
-										book.Add(n,p);
-										Group.setText("");
-										Name.setText("");
-										Phone.setText("");
-										break;
-									}
+									return;
 								}
 								else
 								{
-									address.add(new GROUP(g,n,p));
+									List.setText("");
+									book.Add(n,p);
+									Group.setText("");
+									Name.setText("");
+									Phone.setText("");
+									List.append("Address Applied");
+									break;
 								}
-								
+							}
+							else
+							{
+								List.setText("");
+								Group.setText("");
+								Name.setText("");
+								Phone.setText("");
+								address.add(new GROUP(g,n,p));
+								List.append("New Group Applied");
+								List.setCaretPosition(List.getDocument().getLength());
+								break;	
 							}
 						}
 					}
-				}
+					break;
+					
+				case "DELETE":
+					List.setText("");
+					for(int i = 0; i <= address.size(); i++)
+					{
+						book = address.get(i);
+						if(book.getGroup() == g)
+						{
+							for(int j = 0; j < book.current_address; j++)
+							{
+								if(book.getName(j) == n && book.getPhone(j) == p)
+								{
+									for(int s = j+1; s < book.current_address; s++)
+									{
+										book.name[s-1] = book.name[s];
+										book.phone[s-1] = book.phone[s];
+									}
+									book.current_address--;
+								}
+							}
+							List.append("Delete Address");
+							break;
+						}
+					}
+					break;
+					
+				case "GDELETE":
+					List.setText("");
+					for(int i = 0; i <= address.size(); i++)
+					{
+						book = address.get(i);
+						if(book.getGroup() == g)
+						{
+							address.remove(i);
+							List.setText("");
+							List.append("Delete group");
+							break;
+						}
+					}
+					break;
+					
+				case "GS":
+					List.setText("");
+					for(int i = 0; i < address.size(); i++)
+					{
+						book = address.get(i);
+						if(book.getGroup() == g)
+						{
+							List.append(book.getGroup() + "\n");
+							for(int j = 0; j < book.current_address; j++)
+							{
+								List.append("\t" + "NAME : " + book.getName(j) + " PHONE : " + book.getPhone(j) + "\n");
+							}
+							break;
+						}
+					}
+					break;
+					
+				case "NS":
+					List.setText("");
+					for(int i = 0; i < address.size(); i++)
+					{
+						book = address.get(i);
+						for(int j = 0; j < book.current_address; j++)
+						{
+							if(book.getName(j) == n)
+							{
+								List.append(book.getGroup() + "\n");
+								List.append("\t" + "NAME : " + book.getName(j) + " PHONE : " + book.getPhone(j) + "\n");
+							}
+						}
+					}
+					break;
+					
+				case "AS":
+					List.setText("");
+					for(int i = 0; i < address.size(); i++)
+					{
+						book = address.get(i);
+						List.append(book.getGroup() + "\n");
+						for(int j = 0; j < book.current_address; j++)
+						{
+							List.append("\t" + "NAME : " + book.getName(j) + " PHONE : " + book.getPhone(j) + "\n");
+						}
+					}
+					break;
+					
+				default:
+					List.setText("");
+					List.append("Invaild Selection");
+					break;	
 			}
-			
 		}
-		
 	}
 	public static void main(String[] args)
 	{
 		new GUIAddressBook();
-		
 	}
-
 }
